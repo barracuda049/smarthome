@@ -8,10 +8,8 @@ from dash import Dash, html, Input, Output, ctx
 
 app_path = str(pathlib.Path(__file__).parent.resolve())
 csv = ['a_1.csv', 'b_1.csv', 'c_1.csv']
-# df = pd.read_csv(os.path.join(app_path, os.path.join("data", csv[1])))
-
-
-
+titles = ['Walking', 'Up_down_walking', 'Jumping']
+titles_num = 0
 app = dash.Dash(__name__, url_base_pathname='/dashboard/')
 server = app.server
 
@@ -48,7 +46,7 @@ def build_graph(num=0):
                     'marker': {'size': 12}
                 },
                 {
-                    'x': df.iloc[50:,0],
+                    'x': df.iloc[:,0],
                     'y': df.iloc[:,2],
                     'name': 'Acc Y',
                     'marker': {'size': 12}
@@ -84,7 +82,14 @@ def build_graph(num=0):
                 'paper_bgcolor': theme['background'],
                 'font': {
                     'color': theme['text']
-                }
+                },
+                'xaxis':{
+                    'title': 'Timestamp, ms'
+                },
+                'yaxis':{
+                    'title': 'Data'
+                },
+                'title': titles[num]   
             }
         }
     )
@@ -93,10 +98,10 @@ def build_graph(num=0):
 def add_buttons():
     return html.Div([
         html.Button(
-            'Left', id='to_left', n_clicks=0
+            'Previous', id='to_left', n_clicks=0
         ),
         html.Button(
-            'Right', id='to_right', n_clicks=0
+            'Next', id='to_right', n_clicks=0
         ),  
     ])
 
@@ -108,14 +113,7 @@ def add_buttons():
 )
 def displayClick(btn1, btn2):
 
-    num = 0
-    if "to_left" == ctx.triggered_id:
-
-        num = (num - 1) % len(csv)
-
-    elif "to_right" == ctx.triggered_id:
-
-        num = (num + 1) % len(csv)
+    num = (btn2 - btn1) % len(csv)
 
     return build_graph(num=num)
 
